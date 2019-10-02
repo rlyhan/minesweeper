@@ -1,28 +1,53 @@
 document.addEventListener('DOMContentLoaded', startGame)
 
-// Define your `board` object here!
-var board = {}
-board.cells = []
-for (var i = 0; i < 6; i++) {
-  for (var j = 0; j < 6; j++) {
-    board.cells.push({
-      row: i,
-      col: j,
-      isMine: false,
-      hidden: true
-    })
+var board = {
+  cells: []
+}
+
+function createBoard() {
+  // Set up board of 36 cells, initialise all as non-mines and hidden
+  for (var i = 0; i < 6; i++) {
+    for (var j = 0; j < 6; j++) {
+      board.cells.push({
+        row: i,
+        col: j,
+        isMine: false,
+        hidden: true
+      })
+    }
+  }
+  // Set five cells to be mines
+  var mineCells = chooseRandomCells()
+  for (var i = 0; i < mineCells.length; i++) {
+    board.cells[mineCells[i]].isMine = true
+  }
+  // For each cell, count how many mines surround it
+  for (var i = 0; i < board.cells.length; i++) {
+    board.cells[i].surroundingMines = countSurroundingMines(board.cells[i])
   }
 }
-board.cells[2].isMine = true
-board.cells[3].isMine = true
-board.cells[10].isMine = true
-board.cells[22].isMine = true
 
-for (var i = 0; i < board.cells.length; i++) {
-  board.cells[i].surroundingMines = countSurroundingMines(board.cells[i])
+// Picks 5 random cells
+function chooseRandomCells() {
+  // Initialise array of cells to be chosen
+  var chosenCells = []
+  // Initialise array of cell numbers
+  var cellNumbers = []
+  for (var i = 0; i < 36; i++) {
+    cellNumbers.push(i)
+  }
+  // For five times...
+  for (var i = 0; i < 5; i++) {
+    // Choose a randomly indexed cell number in current array of cell numbers
+    var randomCellIndex = Math.floor((Math.random() * cellNumbers.length));
+    // Remove cell number at random index, add it to chosen cells
+    chosenCells.push(cellNumbers.splice(randomCellIndex, 1)[0]);
+  }
+  return chosenCells
 }
 
 function startGame () {
+  createBoard()
   // Don't remove this function call: it makes the game work!
   lib.initBoard()
   document.addEventListener("click", checkForWin)
