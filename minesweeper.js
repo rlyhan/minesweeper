@@ -1,13 +1,12 @@
 document.addEventListener('DOMContentLoaded', startGame)
 
-var board = {
-  cells: []
-}
+var board;
 
 function createBoard() {
-  // Set up board of 36 cells, initialise all as non-mines and hidden
-  for (var i = 0; i < 6; i++) {
-    for (var j = 0; j < 6; j++) {
+  board = { cells: [] }
+  // Set up board of 16 cells, initialise all as non-mines and hidden
+  for (var i = 0; i < 4; i++) {
+    for (var j = 0; j < 4; j++) {
       board.cells.push({
         row: i,
         col: j,
@@ -27,13 +26,25 @@ function createBoard() {
   }
 }
 
+function resetBoard() {
+  // Clear all cells
+  document.querySelector('.board').innerHTML = ''
+  // Reinitialise global board object
+  createBoard()
+  // Create new board
+  lib.initBoard()
+  // Hide restart button and change display message
+  document.getElementById('restart').style.display = "none"
+  lib.displayMessage('Let\'s play!')
+}
+
 // Picks 5 random cells
 function chooseRandomCells() {
   // Initialise array of cells to be chosen
   var chosenCells = []
   // Initialise array of cell numbers
   var cellNumbers = []
-  for (var i = 0; i < 36; i++) {
+  for (var i = 0; i < 16; i++) {
     cellNumbers.push(i)
   }
   // For five times...
@@ -52,6 +63,7 @@ function startGame () {
   lib.initBoard()
   document.addEventListener("click", checkForWin)
   document.addEventListener("contextmenu", checkForWin)
+  document.getElementById('restart').addEventListener("click", resetBoard)
 }
 
 // Define this function to look for a win condition:
@@ -60,9 +72,12 @@ function startGame () {
 // 2. Are all of the mines marked?
 function checkForWin () {
 
-  // You can use this function call to declare a winner (once you've
-  // detected that they've won, that is!)
-  //   lib.displayMessage('You win!')
+  // If all the mines have exploded, show restart button and return
+  if (document.querySelector('#message p').innerHTML == 'BOOM!') {
+    document.getElementById('restart').style.display = "block"
+    return
+  }
+
   for (var i = 0; i < board.cells.length; i++) {
     // If current cell is a mine
       // If current cell is not marked, return
@@ -79,6 +94,7 @@ function checkForWin () {
     }
   }
   lib.displayMessage('You win!')
+  document.getElementById('restart').style.display = "block"
 }
 
 // Define this function to count the number of mines around the cell
